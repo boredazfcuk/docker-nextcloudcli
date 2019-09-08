@@ -60,7 +60,7 @@ docker create \
    boredazfcuk/nextcloudcli
    ```
 
-#VOLUME CONFIGURATION
+## VOLUME CONFIGURATION
 
 This container will syncronise your Nextcloud account to the "/home/${USERNAME}/Nextcloud" directory inside the container. You need to create a bind mount on the host that is mapped into the container at this location.
 
