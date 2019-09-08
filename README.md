@@ -1,6 +1,8 @@
 # docker-nextcloudcli
 An Alpine Linux Docker container for Nextcloud CLI syncronisation
 
+Now on Docker Hub: https://hub.docker.com/r/boredazfcuk/nextcloudcli
+
 ## MANDATORY ENVIRONMENT VARIABLES
 
 NC_USER: This is the user that you wish to log into Nextcloud as.
