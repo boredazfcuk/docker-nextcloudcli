@@ -1,7 +1,7 @@
 # docker-nextcloudcli
 An Alpine Linux Docker container for Nextcloud CLI syncronisation
 
-##MANDATORY ENVIRONMENT VARIABLES
+## MANDATORY ENVIRONMENT VARIABLES
 
 NC_USER: This is the user that you wish to log into Nextcloud as.
 
@@ -9,7 +9,7 @@ NC_PASSWORD: This is the password for the account named above.
 
 NC_URL: This is the URL to the Nextcloud server's WebDAV URL
 
-##DEFAULT ENVIRONMENT VARIABLES
+## DEFAULT ENVIRONMENT VARIABLES
 
 USER: This is name of the user account that you wish to create within the container. This can be anything you choose, but ideally you would set this to match the name of the user on the host system for which you want to download files for. This user will be set as the owner of all downloaded files. If this variable is not set, it will default to 'user'
 
