@@ -67,7 +67,7 @@ SyncNextcloud(){
    while :; do
       echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Syncronisation started for ${USER}..."
       CheckMount
-      /bin/su -s /bin/ash "${USER}" -c '/usr/bin/nextcloudcmd --user "${NC_USER}" --password "${NC_PASSWORD}" ${NC_CLIOPTIONS} "/home/${USER}/Nextcloud" "${NC_URL}"'
+      /bin/su -s /bin/ash "${USER}" -c '/usr/bin/nextcloudcmd --user '"${NC_USER}"' --password '"${NC_PASSWORD}"' ${NC_CLIOPTIONS} '"/home/${USER}/Nextcloud"' '"${NC_URL}"'; echo $? >/tmp/EXIT_CODE'
       SetOwnerAndGroup
       echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Syncronisation for ${USER} complete"
       echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Next syncronisation at $(date +%H:%M -d "${INTERVAL} seconds")"

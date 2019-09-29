@@ -10,4 +10,7 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Set permissions on startup script" &
 echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Amend Nextloud ignore list" && \
    echo ".mounted" >>/etc/Nextcloud/sync-exclude.lst
 
+HEALTHCHECK --start-period=10s --interval=1m --timeout=10s \
+   CMD (if [ "$(cat /tmp/EXIT_CODE)" = 0 ]; then exit 0; else exit 1; fi)  
+
 CMD /usr/local/bin/sync-nextcloud.sh
