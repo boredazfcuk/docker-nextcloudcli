@@ -8,7 +8,7 @@ Initialise(){
    if [ -z "${UID}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') WARNING: User ID not set, defaulting to '1000'"; UID="1000"; fi
    if [ -z "${GROUP}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') WARNING: Group name not set, defaulting to 'group'"; GROUP="group"; fi
    if [ -z "${GID}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') WARNING: Group ID not set, defaulting to '1000'"; GID="1000"; fi
-   if [ -z "${INTERVAL}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') WARNING: Syncronisation interval not set, defaulting to 21600 seconds (6 hours) "; INTERVAL="21600"; fi
+   if [ -z "${NC_INTERVAL}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') WARNING: Syncronisation NC_INTERVAL not set, defaulting to 21600 seconds (6 hours) "; NC_INTERVAL="21600"; fi
    if [ -z "${NC_URL}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR:   Nextcloud URL not set - exiting"; exit 1; fi
    if [ -z "${NC_USER}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR:   Nextcloud user name not set - exiting"; exit 1; fi
    if [ -z "${NC_PASSWORD}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR:   Nextcloud password not set - exiting"; exit 1; fi
@@ -70,8 +70,8 @@ SyncNextcloud(){
       /bin/su -s /bin/ash "${USER}" -c '/usr/bin/nextcloudcmd --user '"${NC_USER}"' --password '"${NC_PASSWORD}"' ${NC_CLIOPTIONS} '"/home/${USER}/Nextcloud"' '"${NC_URL}"'; echo $? >/tmp/EXIT_CODE'
       SetOwnerAndGroup
       echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Syncronisation for ${USER} complete"
-      echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Next syncronisation at $(date +%H:%M -d "${INTERVAL} seconds")"
-      sleep "${INTERVAL}"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Next syncronisation at $(date +%H:%M -d "${NC_INTERVAL} seconds")"
+      sleep "${NC_INTERVAL}"
    done
 }
 
