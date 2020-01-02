@@ -2,6 +2,7 @@
 
 ##### Functions #####
 Initialise(){
+   echo -e "\n"
    echo "$(date '+%Y-%m-%d %H:%M:%S') | ***** Starting Nexcloud CLI syncronisation container *****"
 
    if [ -z "${USER}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') WARNING: User name not set, defaulting to 'user'"; USER="user"; fi
