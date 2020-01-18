@@ -15,7 +15,7 @@ NC_URL: This is the URL to the Nextcloud server's WebDAV URL
 
 USER: This is name of the user account that you wish to create within the container. This can be anything you choose, but ideally you would set this to match the name of the user on the host system for which you want to download files for. This user will be set as the owner of all downloaded files. If this variable is not set, it will default to 'user'
 
-UID: This is the User ID number of the above user account. This can be any number that isn't already in use. Ideally, you should set this to be the same ID number as the USER's ID on the host system. This will avoid permissions issues if syncing to your host's home directory. If this variable is not set, it will default to '1000'
+user_id: This is the User ID number of the above user account. This can be any number that isn't already in use. Ideally, you should set this to be the same ID number as the USER's ID on the host system. This will avoid permissions issues if syncing to your host's home directory. If this variable is not set, it will default to '1000'
 
 GROUP: This is name of the group account that you wish to create within the container. This can be anything you choose, but ideally you would set this to match the name of the user's primary group on the host system. This This group will be set as the group for all downloaded files. If this variable is not set, it will default to 'group'
 
@@ -30,7 +30,7 @@ docker create \
    --network <Name of Docker network to connect to> \
    --restart=always \
    --env USER=<User Name> \
-   --env UID=<User ID> \
+   --env user_id=<User ID> \
    --env GROUP=<Group Name> \
    --env GID=<Group ID> \
    --env INTERVAL=<Include this if you wish to override the default interval of 6hrs> \
@@ -49,7 +49,7 @@ docker create \
    --network containers \
    --restart always \
    --env USER=boredazfcuk \
-   --env UID=1000 \
+   --env user_id=1000 \
    --env GROUP=admins \
    --env GID=1010 \
    --env INTERVAL=43200 \
