@@ -21,7 +21,7 @@ Initialise(){
    echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Nextcloud user: ${nextcloud_user}"
    echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Nextcloud password: ${nextcloud_password}"
    echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Nextcloud URL: ${nextcloud_url}"
-   if [ ! -z "${nextcloud_command_line_parameters}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Nextcloud Command Line Options: ${nextcloud_command_line_parameters}"; fi
+   if [ "${nextcloud_command_line_parameters}" ]; then echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Nextcloud Command Line Options: ${nextcloud_command_line_parameters}"; fi
 
 
    if [ ! -d "/home/${user}/Nextcloud" ]; then
