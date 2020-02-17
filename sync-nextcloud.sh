@@ -64,10 +64,18 @@ SetOwnerAndGroup(){
    find "/home/${user}/Nextcloud" ! -group "${group}" -exec chgrp "${group}" {} \;
 }
 
+CheckNextcloudOnline(){
+   while [ "$(nc -z nextcloud 443 | echo "${?}")" -ne 0 ]; do
+      echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR:   Nextcloud server not contactable - retry in 5 minutes"
+      sleep 300
+   done
+}
+
 SyncNextcloud(){
    while :; do
       echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Syncronisation started for ${user}..."
       CheckMount
+      CheckNextcloudOnline
       /bin/su -s /bin/ash "${user}" -c '/usr/bin/nextcloudcmd --user '"${nextcloud_user}"' --password '"${nextcloud_password}"' ${nextcloud_command_line_parameters} '"/home/${user}/Nextcloud"' '"${nextcloud_url}"'; echo $? >/tmp/exit_code'
       SetOwnerAndGroup
       echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Syncronisation for ${user} complete"
