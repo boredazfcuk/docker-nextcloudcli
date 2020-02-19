@@ -65,9 +65,13 @@ SetOwnerAndGroup(){
 }
 
 CheckNextcloudOnline(){
-   while [ "$(nc -z nextcloud 443 | echo "${?}")" -ne 0 ]; do
-      echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR:   Nextcloud server not contactable - retry in 5 minutes"
-      sleep 300
+   while [ "$(nc -z nginx 443; echo $?)" -ne 0 ]; do
+      echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR:   Nextcloud web server not contactable - retry in 2 minutes"
+      sleep 120
+   done
+   while [ "$(nc -z mariadb 3306; echo $?)" -ne 0 ]; do
+      echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR:   Nextcloud database server not contactable - retry in 2 minutes"
+      sleep 120
    done
 }
 
