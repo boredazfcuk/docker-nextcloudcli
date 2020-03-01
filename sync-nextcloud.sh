@@ -69,10 +69,6 @@ CheckNextcloudOnline(){
       echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR:   Nextcloud web server not contactable - retry in 2 minutes"
       sleep 120
    done
-   while [ "$(nc -z mariadb 3306; echo $?)" -ne 0 ]; do
-      echo "$(date '+%Y-%m-%d %H:%M:%S') ERROR:   Nextcloud database server not contactable - retry in 2 minutes"
-      sleep 120
-   done
 }
 
 SyncNextcloud(){
