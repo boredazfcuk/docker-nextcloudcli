@@ -1,3 +1,7 @@
+20200313
+
+ - Change: Log now displays OS version
+
 20200227
 
  - Change: Remove MariaDB check before sync. The web front end is first point of failure. If that isn't up it all fails. If the Web page is up but the DB has failed, let the Nextcloud healthcheck alert for that.
