@@ -2,9 +2,9 @@
 
 ##### Functions #####
 Initialise(){
-   echo -e "\n"
-   echo "$(date '+%c') | ***** Starting Nexcloud CLI syncronisation container *****"
-   echo "$(date '+%c') | $(cat /etc/*-release | grep "PRETTY_NAME" | sed 's/PRETTY_NAME=//g' | sed 's/"//g')"
+   echo
+   echo "$(date '+%c') INFO:    ***** Starting Nexcloud CLI syncronisation container *****"
+   echo "$(date '+%c') INFO:    $(cat /etc/*-release | grep "PRETTY_NAME" | sed 's/PRETTY_NAME=//g' | sed 's/"//g')"
    echo "$(date '+%c') INFO:    Local user: ${user:=user}:${user_id:=1000}"
    echo "$(date '+%c') INFO:    Local group: ${group:=group}:${group_id:=1000}"
    echo "$(date '+%c') INFO:    Local directory: /home/${user}/Nextcloud"
