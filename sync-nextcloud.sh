@@ -3,6 +3,7 @@
 ##### Functions #####
 Initialise(){
    echo
+   nextcloud_domain="$(echo "${nextcloud_url}" | awk -F/ '{print $3}')"
    echo "$(date '+%c') INFO:    ***** Starting Nexcloud CLI syncronisation container *****"
    echo "$(date '+%c') INFO:    $(cat /etc/*-release | grep "PRETTY_NAME" | sed 's/PRETTY_NAME=//g' | sed 's/"//g')"
    echo "$(date '+%c') INFO:    Local user: ${user:=user}:${user_id:=1000}"
@@ -11,11 +12,12 @@ Initialise(){
    if [ -z "${nextcloud_user}" ]; then echo "$(date '+%c') ERROR:   Nextcloud user name not set - exiting"; exit 1; fi
    if [ -z "${nextcloud_password}" ]; then echo "$(date '+%c') ERROR:   Nextcloud password not set - exiting"; exit 1; fi
    if [ -z "${nextcloud_url}" ]; then echo "$(date '+%c') ERROR:   Nextcloud URL not set - exiting"; exit 1; fi
+   echo "$(date '+%c') INFO:    Nextcloud domain: ${nextcloud_domain}"
    echo "$(date '+%c') INFO:    Nextcloud user: ${nextcloud_user}"
    echo "$(date '+%c') INFO:    Nextcloud password: ${nextcloud_password}"
    echo "$(date '+%c') INFO:    Nextcloud URL: ${nextcloud_url}"
    echo "$(date '+%c') INFO:    Nextcloud synchronisation interval: ${nextcloud_syncronisation_interval:=21600}"
-   if [ "${nextcloud_command_line_parameters}" ]; then echo "$(date '+%c') INFO:    Nextcloud Command Line Options: ${nextcloud_command_line_parameters}"; fi
+   if [ "${nextcloud_command_line_options}" ]; then echo "$(date '+%c') INFO:    Nextcloud Command Line Options: ${nextcloud_command_line_options}"; fi
    if [ ! -d "/home/${user}/Nextcloud" ]; then
    echo "$(date '+%c') WARNING: Target folder does not exist, creating /home/${user}/Nextcloud"
       mkdir -p "/home/${user}/Nextcloud"
@@ -56,7 +58,7 @@ SetOwnerAndGroup(){
 }
 
 CheckNextcloudOnline(){
-   while [ "$(nc -z nginx 443; echo $?)" -ne 0 ]; do
+   while [ "$(nc -z ${nextcloud_domain} 443; echo $?)" -ne 0 ]; do
       echo "$(date '+%c') ERROR:   Nextcloud web server not contactable - retry in 2 minutes"
       sleep 120
    done
@@ -67,7 +69,7 @@ SyncNextcloud(){
       echo "$(date '+%c') INFO:    Syncronisation started for ${user}..."
       CheckMount
       CheckNextcloudOnline
-      /bin/su -s /bin/ash "${user}" -c '/usr/bin/nextcloudcmd --user '"${nextcloud_user}"' --password '"${nextcloud_password}"' ${nextcloud_command_line_parameters} '"/home/${user}/Nextcloud"' '"${nextcloud_url}"'; echo $? >/tmp/exit_code'
+      /bin/su -s /bin/ash "${user}" -c '/usr/bin/nextcloudcmd --non-interactive --user '"${nextcloud_user}"' --password '"${nextcloud_password}"' ${nextcloud_command_line_options} '"/home/${user}/Nextcloud"' '"${nextcloud_url}"'; echo $? >/tmp/exit_code'
       SetOwnerAndGroup
       echo "$(date '+%c') INFO:    Syncronisation for ${user} complete"
       echo "$(date '+%c') INFO:    Next syncronisation at $(date +%H:%M -d "${nextcloud_syncronisation_interval} seconds")"

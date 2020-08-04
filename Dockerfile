@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.12
 MAINTAINER boredazfcuk
 
 RUN echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Install Nextcloud Client" && \

@@ -1,3 +1,7 @@
+20200803
+
+ - Change: Nextcloud domain now grabbed from URL. Previously the container name 'nginx' was hardcoded, but I'm now using the domain name, just in case the nginx box isn't called nginx.
+
 20200313
 
  - Change: Log now displays OS version
