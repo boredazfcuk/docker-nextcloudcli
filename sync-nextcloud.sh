@@ -25,22 +25,45 @@ Initialise(){
 }
 
 CreateGroup(){
-   if [ -z "$(getent group "${group}" | cut -d: -f3)" ]; then
-      echo "$(date '+%c') INFO:    Group ID available, creating group"
-      addgroup -g "${group_id}" "${group}"
-   elif [ ! "$(getent group "${group}" | cut -d: -f3)" = "${group_id}" ]; then
-      echo "$(date '+%c') ERROR:   Group group_id mismatch - exiting"
-      exit 1
+   if [ "$(grep -c "^${group}:x:${group_id}:" "/etc/group")" -eq 1 ]; then
+      echo "$(date '+%c') INFO     Group, ${group}:${group_id}, already created"
+   else
+      if [ "$(grep -c "^${group}:" "/etc/group")" -eq 1 ]; then
+         echo "$(date '+%c') ERROR    Group name, ${group}, already in use - exiting"
+         sleep 120
+         exit 1
+      elif [ "$(grep -c ":x:${group_id}:" "/etc/group")" -eq 1 ]; then
+         if [ "${force_gid}" = "True" ]; then
+            group="$(grep ":x:${group_id}:" /etc/group | awk -F: '{print $1}')"
+            echo "$(date '+%c') WARNING  Group id, ${group_id}, already exists - continuing as force_gid variable has been set. Group name to use: ${group}"
+         else
+            echo "$(date '+%c') ERROR    Group id, ${group_id}, already in use - exiting"
+            sleep 120
+            exit 1
+         fi
+      else
+         echo "$(date '+%c') INFO     Creating group ${group}:${group_id}"
+         addgroup -g "${group_id}" "${group}"
+      fi
    fi
 }
 
 CreateUser(){
-   if [ -z "$(getent passwd "${user}" | cut -d: -f3)" ]; then
-      echo "$(date '+%c') INFO:    User ID available, creating user"
-      adduser -S -D -G "${group}" -u "${user_id}" "${user}" -h "/home/${user}"
-   elif [ ! "$(getent passwd "${user}" | cut -d: -f3)" = "${user_id}" ]; then
-      echo "$(date '+%c') ERROR:   User ID already in use - exiting"
-      exit 1
+   if [ "$(grep -c "^${user}:x:${user_id}:${group_id}" "/etc/passwd")" -eq 1 ]; then
+      echo "$(date '+%c') INFO     User, ${user}:${user_id}, already created"
+   else
+      if [ "$(grep -c "^${user}:" "/etc/passwd")" -eq 1 ]; then
+         echo "$(date '+%c') ERROR    User name, ${user}, already in use - exiting"
+         sleep 120
+         exit 1
+      elif [ "$(grep -c ":x:${user_id}:$" "/etc/passwd")" -eq 1 ]; then
+         echo "$(date '+%c') ERROR    User id, ${user_id}, already in use - exiting"
+         sleep 120
+         exit 1
+      else
+         echo "$(date '+%c') INFO     Creating user ${user}:${user_id}"
+         adduser -s /bin/ash -D -G "${group}" -u "${user_id}" "${user}" -h "/home/${user}"
+      fi
    fi
 }
 
