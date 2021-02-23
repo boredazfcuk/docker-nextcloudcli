@@ -4,7 +4,8 @@
 Initialise(){
    echo
    nextcloud_domain="$(echo "${nextcloud_url}" | awk -F/ '{print $3}')"
-   echo "$(date '+%c') INFO:    ***** Starting Nexcloud CLI syncronisation container *****"
+   nextcloud_login_url="${nextcloud_url/\/remote.php\/webdav/}login"
+   echo "$(date '+%c') INFO:    ***** Starting Nexcloud CLI synchronisation container *****"
    echo "$(date '+%c') INFO:    $(cat /etc/*-release | grep "PRETTY_NAME" | sed 's/PRETTY_NAME=//g' | sed 's/"//g')"
    echo "$(date '+%c') INFO:    Local user: ${user:=user}:${user_id:=1000}"
    echo "$(date '+%c') INFO:    Local group: ${group:=group}:${group_id:=1000}"
@@ -16,7 +17,8 @@ Initialise(){
    echo "$(date '+%c') INFO:    Nextcloud user: ${nextcloud_user}"
    echo "$(date '+%c') INFO:    Nextcloud password: ${nextcloud_password}"
    echo "$(date '+%c') INFO:    Nextcloud URL: ${nextcloud_url}"
-   echo "$(date '+%c') INFO:    Nextcloud synchronisation interval: ${nextcloud_syncronisation_interval:=21600}"
+   echo "$(date '+%c') INFO:    Nextcloud login page URL: ${nextcloud_login_url}"
+   echo "$(date '+%c') INFO:    Nextcloud synchronisation interval: ${nextcloud_synchronisation_interval:=21600}"
    if [ "${nextcloud_command_line_options}" ]; then echo "$(date '+%c') INFO:    Nextcloud Command Line Options: ${nextcloud_command_line_options}"; fi
    if [ ! -d "/home/${user}/Nextcloud" ]; then
    echo "$(date '+%c') WARNING: Target folder does not exist, creating /home/${user}/Nextcloud"
@@ -81,22 +83,24 @@ SetOwnerAndGroup(){
 }
 
 CheckNextcloudOnline(){
-   while [ "$(nc -z ${nextcloud_domain} 443; echo $?)" -ne 0 ]; do
-      echo "$(date '+%c') ERROR:   Nextcloud web server not contactable - retry in 2 minutes"
-      sleep 120
+   echo "$(date '+%c') INFO:    Check Nextcloud server is online"
+   while ! wget --quiet --spider "${nextcloud_login_url}" >/dev/null 2>&1; do
+      echo "$(date '+%c') ERROR:   Nextcloud web server not contactable - retry in 5 seconds"
+      sleep 5
    done
+   echo "$(date '+%c') INFO:    Nextcloud server is available"
 }
 
 SyncNextcloud(){
    while :; do
-      echo "$(date '+%c') INFO:    Syncronisation started for ${user}..."
+      echo "$(date '+%c') INFO:    Synchronisation started for ${user}..."
       CheckMount
       CheckNextcloudOnline
       /bin/su -s /bin/ash "${user}" -c '/usr/bin/nextcloudcmd --non-interactive --user '"${nextcloud_user}"' --password '"${nextcloud_password}"' ${nextcloud_command_line_options} '"/home/${user}/Nextcloud"' '"${nextcloud_url}"'; echo $? >/tmp/exit_code'
       SetOwnerAndGroup
-      echo "$(date '+%c') INFO:    Syncronisation for ${user} complete"
-      echo "$(date '+%c') INFO:    Next syncronisation at $(date +%H:%M -d "${nextcloud_syncronisation_interval} seconds")"
-      sleep "${nextcloud_syncronisation_interval}"
+      echo "$(date '+%c') INFO:    Synchronisation for ${user} complete"
+      echo "$(date '+%c') INFO:    Next synchronisation at $(date +%H:%M -d "${nextcloud_synchronisation_interval} seconds")"
+      sleep "${nextcloud_synchronisation_interval}"
    done
 }
 
