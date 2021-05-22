@@ -67,3 +67,5 @@ docker create \
 This container will syncronise your Nextcloud account to the "/home/${USERNAME}/Nextcloud" directory inside the container. You need to create a bind mount on the host that is mapped into the container at this location.
 
 To prevent everything being deleted by mistake, I have a failsafe built in. The launch script will look for a file called .mounted in the "/home/${USERNAME}/Nextcloud" folder. If this file is not present, it will not sync with the Nextcloud server. This is so that if the underlying disk/volume/whatever gets unmounted, sync will not occur. This prevents the script from filling up the root volume if the underlying volume isn't mounted for whatever reason. This file MUST be created manually and sync will not start without it.
+
+Litecoin: LfmogjcqJXHnvqGLTYri5M8BofqqXQttk4
