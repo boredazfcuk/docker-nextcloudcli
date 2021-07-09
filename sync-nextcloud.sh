@@ -19,6 +19,7 @@ Initialise(){
    echo "$(date '+%c') INFO:    Nextcloud URL: ${nextcloud_url}"
    echo "$(date '+%c') INFO:    Nextcloud login page URL: ${nextcloud_login_url}"
    echo "$(date '+%c') INFO:    Nextcloud synchronisation interval: ${nextcloud_synchronisation_interval:=21600}"
+   echo "$(date '+%c') INFO:    Nextcloud excluded files: ${nextcloud_excluded_files:=None}"
    if [ "${nextcloud_command_line_options}" ]; then echo "$(date '+%c') INFO:    Nextcloud Command Line Options: ${nextcloud_command_line_options}"; fi
    if [ ! -d "/home/${user}/Nextcloud" ]; then
    echo "$(date '+%c') WARNING: Target folder does not exist, creating /home/${user}/Nextcloud"

@@ -5,7 +5,8 @@ RUN echo "$(date '+%d/%m/%Y - %H:%M:%S') | ***** BUILD STARTED FOR NEXTCLOUDCLI 
 echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Install Nextcloud Client" && \
    apk add --no-cache nextcloud-client coreutils tzdata && \
 echo "$(date '+%Y-%m-%d %H:%M:%S') INFO:    Amend Nextloud ignore list" && \
-   echo ".mounted" >>/etc/Nextcloud/sync-exclude.lst
+   echo ".mounted" >>/etc/Nextcloud/sync-exclude.lst && \
+   echo "]desktop.ini" >>/etc/Nextcloud/sync-exclude.lst
 
 COPY sync-nextcloud.sh /usr/local/bin/sync-nextcloud.sh
 COPY healthcheck.sh /usr/local/bin/healthcheck.sh
