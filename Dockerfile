@@ -1,4 +1,4 @@
-FROM alpine:3.13
+FROM alpine:3.14
 MAINTAINER boredazfcuk
 
 RUN echo "$(date '+%d/%m/%Y - %H:%M:%S') | ***** BUILD STARTED FOR NEXTCLOUDCLI *****" && \
