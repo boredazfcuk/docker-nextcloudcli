@@ -72,7 +72,7 @@ CreateUser(){
 
 CheckMount(){
    while [ ! -f "/home/${user}/Nextcloud/.mounted" ]; do
-      echo "$(date '+%c') ERROR:   Local directory not mounted - retry in 5 minutes"
+      echo "$(date '+%c') ERROR:   Local directory not mounted. /home/${user}/Nextcloud/.mounted does not exist - retry in 5 minutes"
       sleep 300
    done
 }
