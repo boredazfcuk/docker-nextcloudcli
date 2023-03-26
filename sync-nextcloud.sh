@@ -3,11 +3,14 @@
 ##### Functions #####
 Initialise(){
    echo
+   sync_counter=0
+   echo 0 > /tmp/exit_code
+   chown "${user_id:=1000}" /tmp/exit_code
    nextcloud_domain="$(echo "${nextcloud_url}" | awk -F/ '{print $3}')"
    nextcloud_login_url="${nextcloud_url/\/remote.php\/webdav/}login"
    echo "$(date '+%c') INFO:    ***** Starting Nexcloud CLI synchronisation container *****"
    echo "$(date '+%c') INFO:    $(cat /etc/*-release | grep "PRETTY_NAME" | sed 's/PRETTY_NAME=//g' | sed 's/"//g')"
-   echo "$(date '+%c') INFO:    Local user: ${user:=user}:${user_id:=1000}"
+   echo "$(date '+%c') INFO:    Local user: ${user:=user}:${user_id}"
    echo "$(date '+%c') INFO:    Local group: ${group:=group}:${group_id:=1000}"
    echo "$(date '+%c') INFO:    Local directory: /home/${user}/Nextcloud"
    if [ -z "${nextcloud_user}" ]; then echo "$(date '+%c') ERROR:   Nextcloud user name not set - exiting"; exit 1; fi
@@ -19,6 +22,9 @@ Initialise(){
    echo "$(date '+%c') INFO:    Nextcloud URL: ${nextcloud_url}"
    echo "$(date '+%c') INFO:    Nextcloud login page URL: ${nextcloud_login_url}"
    echo "$(date '+%c') INFO:    Nextcloud synchronisation interval: ${nextcloud_synchronisation_interval:=21600}"
+   if [ "${nextcloud_synchronisation_delay}" ]; then
+      echo "$(date '+%c') INFO:    Nextcloud synchronisation delay: ${nextcloud_synchronisation_delay}"
+   fi
    echo "$(date '+%c') INFO:    Nextcloud excluded files: ${nextcloud_excluded_files:=None}"
    if [ "${nextcloud_command_line_options}" ]; then echo "$(date '+%c') INFO:    Nextcloud Command Line Options: ${nextcloud_command_line_options}"; fi
    if [ ! -d "/home/${user}/Nextcloud" ]; then
@@ -78,9 +84,11 @@ CheckMount(){
 }
 
 SetOwnerAndGroup(){
-   echo "$(date '+%c') INFO:    Correct owner and group of syncronised files, if required"
-   find "/home/${user}/Nextcloud" ! -user "${user}" -exec chown "${user}" {} \;
-   find "/home/${user}/Nextcloud" ! -group "${group}" -exec chgrp "${group}" {} \;
+   echo "$(date '+%c') INFO:    Correct owner of synchronised files, if required"
+   find "/home/${user}/Nextcloud" ! -type l ! -user "${user}" -exec chown "${user}" {} \;
+   echo "$(date '+%c') INFO:    Correct group of synchronised files, if required"
+   find "/home/${user}/Nextcloud" ! -type l ! -group "${group}" -exec chgrp "${group}" {} \;
+   echo "$(date '+%c') INFO:    File owner and group correction complete"
 }
 
 CheckNextcloudOnline(){
@@ -93,15 +101,34 @@ CheckNextcloudOnline(){
 }
 
 SyncNextcloud(){
+   echo "$(date '+%c') INFO:    Synchronisation started for ${user}..."
+   CheckMount
+   CheckNextcloudOnline
+   /bin/su -s /bin/ash "${user}" -c '/usr/bin/nextcloudcmd --non-interactive --user '"${nextcloud_user}"' --password '"${nextcloud_password}"' ${nextcloud_command_line_options} '"/home/${user}/Nextcloud"' '"${nextcloud_url}"'; echo $? >/tmp/exit_code'
+   SetOwnerAndGroup
+   echo "$(date '+%c') INFO:    Synchronisation for ${user} complete"
+}
+
+SyncLoop(){
+   echo "$(date '+%c') INFO:    Initialisation complete"
+   if [ "${nextcloud_synchronisation_delay}" ]; then
+      echo "$(date '+%c') INFO:    Nextcloud synchronisation delayed for ${nextcloud_synchronisation_delay} minutes"
+      sleep "${nextcloud_synchronisation_delay}m"
+   fi
+   SyncNextcloud
    while :; do
-      echo "$(date '+%c') INFO:    Synchronisation started for ${user}..."
-      CheckMount
-      CheckNextcloudOnline
-      /bin/su -s /bin/ash "${user}" -c '/usr/bin/nextcloudcmd --non-interactive --user '"${nextcloud_user}"' --password '"${nextcloud_password}"' ${nextcloud_command_line_options} '"/home/${user}/Nextcloud"' '"${nextcloud_url}"'; echo $? >/tmp/exit_code'
-      SetOwnerAndGroup
-      echo "$(date '+%c') INFO:    Synchronisation for ${user} complete"
-      echo "$(date '+%c') INFO:    Next synchronisation at $(date +%H:%M -d "${nextcloud_synchronisation_interval} seconds")"
-      sleep "${nextcloud_synchronisation_interval}"
+      if [ "${sync_counter}" -ge "${nextcloud_synchronisation_interval}" ]; then
+         echo "$(date '+%c') INFO:    Synchronisation interval reached for ${user}"
+         SyncNextcloud
+         echo "$(date '+%c') INFO:    Next synchronisation at $(date +%H:%M -d "${nextcloud_synchronisation_interval} seconds")"
+         sync_counter=0
+      elif [ -f "/home/${user}/Nextcloud/iCloud/.nextcloud_sync" ]; then
+         echo "$(date '+%c') INFO:    Synchronisation triggered by icloudpd for ${user}"
+         SyncNextcloud
+         rm "/home/${user}/Nextcloud/iCloud/.nextcloud_sync"
+      fi
+      sync_counter=$((sync_counter + 60))
+      sleep 60
    done
 }
 
@@ -111,4 +138,4 @@ CreateGroup
 CreateUser
 CheckMount
 SetOwnerAndGroup
-SyncNextcloud
+SyncLoop
